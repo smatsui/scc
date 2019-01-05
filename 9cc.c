@@ -7,6 +7,7 @@
 // Token type
 enum {
   TK_NUM = 256, // Number token
+  TK_IDENT,     // variable
   TK_EOF,
 };
 
@@ -18,13 +19,15 @@ typedef struct {
 
 enum {
   ND_NUM = 256,
+  ND_IDENT,
 };
 
 typedef struct Node {
-  int ty;
-  struct Node *lhs;
-  struct Node *rhs;
-  int val;
+  int ty;            // operator or ND_NUM
+  struct Node *lhs;  // left-hand side
+  struct Node *rhs;  // right-hand side
+  int val;           // for ND_NUM
+  char name;         // for ND_IDENT
 } Node;
 
 // Buffer for tokenized result.
@@ -34,9 +37,14 @@ Token tokens[100];
 // Index of tokens
 int pos;
 
-Node *term();
-Node *mul();
+// Buffer for parsed node.
+Node *code[100];
+
+Node *program();
+Node *assign();
 Node *expr();
+Node *mul();
+Node *term();
 
 void tokenize(char *p) {
   int i = 0;
@@ -47,7 +55,7 @@ void tokenize(char *p) {
     }
 
     if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' ||
-        *p == ')') {
+        *p == ')' || *p == '=' || *p == ';') {
       tokens[i].ty = *p;
       tokens[i].input = p;
       i++;
@@ -60,6 +68,14 @@ void tokenize(char *p) {
       tokens[i].input = p;
       tokens[i].val = strtol(p, &p, 10);
       i++;
+      continue;
+    }
+
+    if('a' <= *p && *p <= 'z'){
+      tokens[i].ty = TK_IDENT;
+      tokens[i].input = p;
+      i++;
+      p++;
       continue;
     }
 
@@ -94,24 +110,45 @@ Node *new_node_num(int val) {
   return node;
 }
 
+Node *new_node_ident(char name){
+  Node *node = calloc(1, sizeof(Node));
+  node->ty = ND_IDENT;
+  node->name = name;
+  return node;
+}
+
 void print_tree(Node *node) {
+  static int depth;
+
   if (node == NULL) {
     return;
   }
-  printf("  ");
+
+  depth++;
+
   print_tree(node->lhs);
   if (node->ty == ND_NUM) {
+    for(int i=0; i<depth; i++){
+      printf("  ");
+    }
     printf("%d\n", node->val);
+    depth--;
   } else {
-    printf("  ");
+    for(int i=0; i<depth; i++){
+      printf("  ");
+    }
     printf("%c\n", (char)node->ty);
   }
   print_tree(node->rhs);
+  depth--;
 }
 
 Node *term() {
   if (tokens[pos].ty == TK_NUM) {
     return new_node_num(tokens[pos++].val);
+  }
+  if (tokens[pos].ty == TK_IDENT) {
+    return new_node_ident(tokens[pos++].val);
   }
   if (tokens[pos].ty == '(') {
     pos++;
@@ -151,9 +188,60 @@ Node *expr() {
   return lhs;
 }
 
+Node *assign() {
+  Node *lhs = expr();
+  if (tokens[pos].ty == '=') {
+    pos++;
+    Node* node = new_node('=', lhs, assign());
+    if (tokens[pos].ty != ';') {
+      error("semicolon not found: %s", tokens[pos].input);
+    }
+    pos++;
+    return node;
+  }
+  if (tokens[pos].ty != ';') {
+    error("semicolon not found: %s", tokens[pos].input);
+  }
+  return lhs;
+}
+
+Node *program() {
+  return assign();
+}
+
+void gen_lval(Node *node){
+  if (node->ty == ND_IDENT){
+    printf("  mov rax, rbp\n");
+    printf("  sub rax, %d\n",
+           ('z' - node->name + 1) * 8);
+    printf("push rax\n");
+    return;
+  }
+  error("lval is not a variable");
+}
+
 void gen(Node *node) {
   if (node->ty == ND_NUM) {
     printf("  push %d\n", node->val);
+    return;
+  }
+
+  if (node->ty == ND_IDENT) {
+    gen_lval(node);
+    printf("  pop rax\n");
+    printf("  mov rax, [rax]\n");
+    printf("  push rax\n");
+    return;
+  }
+
+  if (node->ty == '=') {
+    gen_lval(node->lhs);
+    gen(node->rhs);
+
+    printf("  pop rdi\n");
+    printf("  pop rax\n");
+    printf("  mov [rax], rdi\n");
+    printf("  push rdi\n");
     return;
   }
 
@@ -189,15 +277,24 @@ int main(int argc, char **argv) {
   }
 
   tokenize(argv[1]);
-  Node *node = expr();
+  Node* node = program();
 
   printf(".intel_syntax noprefix\n");
   printf(".global _main\n");
   printf("_main:\n");
 
+  //prolog
+  printf("  push rbp\n");
+  printf("  mov rbp, rsp\n");
+  printf("  sub rsp, 208\n");
+
   gen(node);
 
   printf("  pop rax\n");
+
+  // epilog
+  printf("  mov rsp, rbp\n");
+  printf("  pop rbp\n");
   printf("  ret\n");
 
   return 0;
