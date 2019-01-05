@@ -1,19 +1,19 @@
 #include <ctype.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 
 // Token type
 enum {
-  TK_NUM = 256, //Number token
+  TK_NUM = 256, // Number token
   TK_EOF,
 };
 
 typedef struct {
-  int ty;       //token type
-  int val;      //value for TK_NUM type
-  char *input;  //for error message
+  int ty;      // token type
+  int val;     // value for TK_NUM type
+  char *input; // for error message
 } Token;
 
 enum {
@@ -34,6 +34,10 @@ Token tokens[100];
 // Index of tokens
 int pos;
 
+Node *term();
+Node *mul();
+Node *expr();
+
 void tokenize(char *p) {
   int i = 0;
   while (*p) {
@@ -42,7 +46,8 @@ void tokenize(char *p) {
       continue;
     }
 
-    if (*p == '+' || *p == '-' || *p == '*' || *p == '/') {
+    if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' ||
+        *p == ')') {
       tokens[i].ty = *p;
       tokens[i].input = p;
       i++;
@@ -89,56 +94,65 @@ Node *new_node_num(int val) {
   return node;
 }
 
-void print_tree(Node* node){
-  if(node == NULL){
+void print_tree(Node *node) {
+  if (node == NULL) {
     return;
   }
   printf("  ");
   print_tree(node->lhs);
-  if(node->ty == ND_NUM){
+  if (node->ty == ND_NUM) {
     printf("%d\n", node->val);
-  }else{
+  } else {
     printf("  ");
     printf("%c\n", (char)node->ty);
   }
   print_tree(node->rhs);
 }
 
-Node *term(){
+Node *term() {
   if (tokens[pos].ty == TK_NUM) {
     return new_node_num(tokens[pos++].val);
+  }
+  if (tokens[pos].ty == '(') {
+    pos++;
+    Node *node = expr();
+    if (tokens[pos].ty != ')') {
+      error("there is no right parenthesis: %s", tokens[pos].input);
+    }
+    pos++;
+    return node;
   }
   error("not a number or a left parenthesis: %s", tokens[pos].input);
 }
 
-Node *mul(){
+Node *mul() {
   Node *lhs = term();
-  if(tokens[pos].ty == '*'){
+  if (tokens[pos].ty == '*') {
     pos++;
     return new_node('*', lhs, mul());
   }
-  if(tokens[pos].ty == '/'){
+  if (tokens[pos].ty == '/') {
     pos++;
     return new_node('/', lhs, mul());
   }
   return lhs;
 }
 
-Node *expr(){
+Node *expr() {
   Node *lhs = mul();
-  if (tokens[pos].ty == '+'){
+  if (tokens[pos].ty == '+') {
     pos++;
     return new_node('+', lhs, expr());
   }
-  if (tokens[pos].ty == '-'){
+  if (tokens[pos].ty == '-') {
     pos++;
     return new_node('-', lhs, expr());
   }
   return lhs;
 }
 
-void gen(Node *node){
-  if(node->ty == ND_NUM){
+void gen(Node *node) {
+  if (node->ty == ND_NUM) {
     printf("  push %d\n", node->val);
     return;
   }
@@ -149,7 +163,7 @@ void gen(Node *node){
   printf("  pop rdi\n");
   printf("  pop rax\n");
 
-  switch(node->ty){
+  switch (node->ty) {
   case '+':
     printf("  add rax, rdi\n");
     break;
