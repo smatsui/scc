@@ -42,7 +42,7 @@ void tokenize(char *p) {
       continue;
     }
 
-    if (*p == '+' || *p == '-') {
+    if (*p == '+' || *p == '-' || *p == '*') {
       tokens[i].ty = *p;
       tokens[i].input = p;
       i++;
@@ -75,7 +75,7 @@ void error(const char *format, ...) {
 }
 
 Node *new_node(int ty, Node *lhs, Node *rhs) {
-  Node *node = malloc(sizeof(Node));
+  Node *node = calloc(1, sizeof(Node));
   node->ty = ty;
   node->lhs = lhs;
   node->rhs = rhs;
@@ -83,10 +83,25 @@ Node *new_node(int ty, Node *lhs, Node *rhs) {
 }
 
 Node *new_node_num(int val) {
-  Node *node = malloc(sizeof(Node));
+  Node *node = calloc(1, sizeof(Node));
   node->ty = ND_NUM;
   node->val = val;
   return node;
+}
+
+void print_tree(Node* node){
+  if(node == NULL){
+    return;
+  }
+  printf("  ");
+  print_tree(node->lhs);
+  if(node->ty == ND_NUM){
+    printf("%d\n", node->val);
+  }else{
+    printf("  ");
+    printf("%c\n", (char)node->ty);
+  }
+  print_tree(node->rhs);
 }
 
 Node *term(){
@@ -98,6 +113,10 @@ Node *term(){
 
 Node *mul(){
   Node *lhs = term();
+  if(tokens[pos].ty == '*'){
+    pos++;
+    return new_node('*', lhs, mul());
+  }
   return lhs;
 }
 
@@ -132,6 +151,9 @@ void gen(Node *node){
     break;
   case '-':
     printf("  sub rax, rdi\n");
+    break;
+  case '*':
+    printf("  mul rdi\n");
     break;
   }
 
