@@ -8,7 +8,9 @@ try() {
   ./tmp
   actual="$?"
 
-  if [ "$actual" != "$expected" ]; then
+  if [ "$actual" = "$expected" ]; then
+    echo "$input => $actual"
+  else
     echo "$expected expected, but got $actual"
     exit 1
   fi
@@ -24,4 +26,6 @@ try 15 "5*(9-6);"
 try 4 "(3+5)/2;"
 try 2 "a=2;"
 try 3 "b=1+2;"
+try 3 "a=2; b=1+2;"
+try 4 "a=2; b=1+2; c=(3+5)/2;"
 echo OK

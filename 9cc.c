@@ -40,7 +40,7 @@ int pos;
 // Buffer for parsed node.
 Node *code[100];
 
-Node *program();
+void program();
 Node *assign();
 Node *expr();
 Node *mul();
@@ -148,7 +148,7 @@ Node *term() {
     return new_node_num(tokens[pos++].val);
   }
   if (tokens[pos].ty == TK_IDENT) {
-    return new_node_ident(tokens[pos++].val);
+    return new_node_ident(tokens[pos++].input[0]);
   }
   if (tokens[pos].ty == '(') {
     pos++;
@@ -193,20 +193,22 @@ Node *assign() {
   if (tokens[pos].ty == '=') {
     pos++;
     Node* node = new_node('=', lhs, assign());
-    if (tokens[pos].ty != ';') {
-      error("semicolon not found: %s", tokens[pos].input);
-    }
-    pos++;
     return node;
   }
   if (tokens[pos].ty != ';') {
     error("semicolon not found: %s", tokens[pos].input);
   }
+  pos++;
   return lhs;
 }
 
-Node *program() {
-  return assign();
+void program() {
+  int i = 0;
+  while(tokens[pos].ty != TK_EOF){
+    code[i] = assign();
+    i++;
+  }
+  code[i] = NULL;
 }
 
 void gen_lval(Node *node){
@@ -277,7 +279,7 @@ int main(int argc, char **argv) {
   }
 
   tokenize(argv[1]);
-  Node* node = program();
+  program();
 
   printf(".intel_syntax noprefix\n");
   printf(".global _main\n");
@@ -288,9 +290,11 @@ int main(int argc, char **argv) {
   printf("  mov rbp, rsp\n");
   printf("  sub rsp, 208\n");
 
-  gen(node);
+  for(int i=0; code[i]; i++){
+    gen(code[i]);
 
-  printf("  pop rax\n");
+    printf("  pop rax\n");
+  }
 
   // epilog
   printf("  mov rsp, rbp\n");
