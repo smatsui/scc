@@ -28,4 +28,6 @@ try 2 "a=2;"
 try 3 "b=1+2;"
 try 3 "a=2; b=1+2;"
 try 4 "a=2; b=1+2; c=(3+5)/2;"
+try 3 "a=b=(12+3)/5;"
+try 6 "a=b=3; a+b;"
 echo OK
