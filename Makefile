@@ -1,7 +1,15 @@
-9cc: 9cc.c
+CC=gcc
+CFLAGS=-Wall -std=c11
+SRCS=$(wildcard *.c)
+OBJS=$(SRCS:.c=.o)
 
-test: 9cc
+scc: $(OBJS)
+	$(CC) -o scc $(OBJS)
+
+$(OBJS): scc.h
+
+test: scc
 	./test.sh
 
 clean:
-	rm -f 9cc *.o *~ tmp*
+	rm -f scc *.o *~ tmp*
