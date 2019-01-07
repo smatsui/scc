@@ -2,12 +2,16 @@
 enum {
   TK_NUM = 256, // Number token
   TK_IDENT,     // variable
+  TK_EQUAL,     // "=="
+  TK_NOT_EQUAL, // "!="
   TK_EOF,
 };
 
 enum {
   ND_NUM = 256,
   ND_IDENT,
+  ND_EQUAL,
+  ND_NOT_EQUAL,
 };
 
 typedef struct {

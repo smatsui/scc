@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "scc.h"
 
 // Buffer for parsed node.
@@ -9,6 +10,24 @@ Node *expr();
 Node *mul();
 Node *term();
 
+void print_tree(Node *node){
+  if(node == NULL){
+    return;
+  }
+  if(node->ty == ND_NUM){
+    printf("%d\n", node->val);
+  }else if(node->ty == ND_IDENT){
+    printf("%c\n", node->name);
+  }else if(node->ty == ND_EQUAL){
+    printf("==\n");
+  }else if(node->ty == ND_NOT_EQUAL){
+    printf("!=\n");
+  }else{
+    printf("%c\n", (char)node->ty);
+  }
+  print_tree(node->lhs);
+  print_tree(node->rhs);
+}
 
 Node *new_node(int ty, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
@@ -65,15 +84,28 @@ Node *mul() {
   return lhs;
 }
 
-Node *expr() {
+Node *expr_prime() {
   Node *lhs = mul();
   if (tokens[pos].ty == '+') {
     pos++;
-    return new_node('+', lhs, expr());
+    return new_node('+', lhs, expr_prime());
   }
   if (tokens[pos].ty == '-') {
     pos++;
-    return new_node('-', lhs, expr());
+    return new_node('-', lhs, expr_prime());
+  }
+  return lhs;
+}
+
+Node *expr() {
+  Node *lhs = expr_prime();
+  if (tokens[pos].ty == ND_EQUAL) {
+    pos++;
+    return new_node(ND_EQUAL, lhs, expr());
+  }
+  if (tokens[pos].ty == ND_NOT_EQUAL) {
+    pos++;
+    return new_node(ND_NOT_EQUAL, lhs, expr());
   }
   return lhs;
 }

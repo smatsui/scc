@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
   printf(".global _main\n");
   printf("_main:\n");
 
-  //prolog
+  //prologue
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
   printf("  sub rsp, 208\n");
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     printf("  pop rax\n");
   }
 
-  // epilog
+  // epilogue
   printf("  mov rsp, rbp\n");
   printf("  pop rbp\n");
   printf("  ret\n");

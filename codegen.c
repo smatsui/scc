@@ -7,7 +7,7 @@ void gen_lval(Node *node){
     printf("  mov rax, rbp\n");
     printf("  sub rax, %d\n",
            ('z' - node->name + 1) * 8);
-    printf("push rax\n");
+    printf("  push rax\n");
     return;
   }
   error("lval is not a variable");
@@ -57,6 +57,16 @@ void gen(Node *node) {
   case '/':
     printf("  mov rdx, 0\n");
     printf("  div rdi\n");
+    break;
+  case ND_EQUAL:
+    printf("  cmp rdi, rax\n");
+    printf("  sete al\n");
+    printf("  movzx rax, al\n");
+    break;
+  case ND_NOT_EQUAL:
+    printf("  cmp rdi, rax\n");
+    printf("  setne al\n");
+    printf("  movzx rax, al\n");
     break;
   }
 
