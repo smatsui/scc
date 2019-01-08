@@ -37,8 +37,26 @@ void tokenize(char *p) {
       continue;
     }
 
+    // >=
+    if(*p == '>' && *(p+1) == '='){
+      tokens[i].ty = TK_GREATER_EQUAL;
+      tokens[i].input = p;
+      i++;
+      p = p+2;
+      continue;
+    }
+
+    // <=
+    if(*p == '<' && *(p+1) == '='){
+      tokens[i].ty = TK_LESS_EQUAL;
+      tokens[i].input = p;
+      i++;
+      p = p+2;
+      continue;
+    }
+
     if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' ||
-        *p == ')' || *p == '=' || *p == ';') {
+        *p == ')' || *p == '=' || *p == ';' || *p == '<' || *p == '>') {
       tokens[i].ty = *p;
       tokens[i].input = p;
       i++;

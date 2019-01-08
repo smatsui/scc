@@ -6,6 +6,8 @@
 Node *code[100];
 
 Node *assign();
+Node *equ();
+Node *cmp();
 Node *expr();
 Node *mul();
 Node *term();
@@ -84,34 +86,55 @@ Node *mul() {
   return lhs;
 }
 
-Node *expr_prime() {
+Node *expr() {
   Node *lhs = mul();
   if (tokens[pos].ty == '+') {
     pos++;
-    return new_node('+', lhs, expr_prime());
+    return new_node('+', lhs, expr());
   }
   if (tokens[pos].ty == '-') {
     pos++;
-    return new_node('-', lhs, expr_prime());
+    return new_node('-', lhs, expr());
   }
   return lhs;
 }
 
-Node *expr() {
-  Node *lhs = expr_prime();
-  if (tokens[pos].ty == ND_EQUAL) {
+Node *cmp() {
+  Node *lhs = expr();
+  if (tokens[pos].ty == '>') {
     pos++;
-    return new_node(ND_EQUAL, lhs, expr());
+    return new_node('>', lhs, cmp());
   }
-  if (tokens[pos].ty == ND_NOT_EQUAL) {
+  if (tokens[pos].ty == '<') {
     pos++;
-    return new_node(ND_NOT_EQUAL, lhs, expr());
+    return new_node('<', lhs, cmp());
+  }
+  if (tokens[pos].ty == TK_GREATER_EQUAL) {
+    pos++;
+    return new_node(ND_GREATER_EQUAL, lhs, cmp());
+  }
+  if (tokens[pos].ty == TK_LESS_EQUAL) {
+    pos++;
+    return new_node(ND_LESS_EQUAL, lhs, cmp());
+  }
+  return lhs;
+}
+
+Node *equ() {
+  Node *lhs = cmp();
+  if (tokens[pos].ty == TK_EQUAL) {
+    pos++;
+    return new_node(ND_EQUAL, lhs, equ());
+  }
+  if (tokens[pos].ty == TK_NOT_EQUAL) {
+    pos++;
+    return new_node(ND_NOT_EQUAL, lhs, equ());
   }
   return lhs;
 }
 
 Node *assign() {
-  Node *lhs = expr();
+  Node *lhs = equ();
   if (tokens[pos].ty == '=') {
     pos++;
     Node* node = new_node('=', lhs, assign());

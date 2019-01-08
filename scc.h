@@ -1,9 +1,11 @@
 // Token type
 enum {
-  TK_NUM = 256, // Number token
-  TK_IDENT,     // variable
-  TK_EQUAL,     // "=="
-  TK_NOT_EQUAL, // "!="
+  TK_NUM = 256,     // Number token
+  TK_IDENT,         // variable
+  TK_EQUAL,         // "=="
+  TK_NOT_EQUAL,     // "!="
+  TK_GREATER_EQUAL, // ">="
+  TK_LESS_EQUAL,    // "<="
   TK_EOF,
 };
 
@@ -12,6 +14,8 @@ enum {
   ND_IDENT,
   ND_EQUAL,
   ND_NOT_EQUAL,
+  ND_GREATER_EQUAL,
+  ND_LESS_EQUAL,
 };
 
 typedef struct {
