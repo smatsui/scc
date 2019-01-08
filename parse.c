@@ -6,6 +6,9 @@
 Node *code[100];
 
 Node *assign();
+Node *bit_or();
+Node *bit_xor();
+Node *bit_and();
 Node *equ();
 Node *cmp();
 Node *expr();
@@ -133,8 +136,35 @@ Node *equ() {
   return lhs;
 }
 
-Node *assign() {
+Node *bit_and() {
   Node *lhs = equ();
+  if (tokens[pos].ty == '&') {
+    pos++;
+    return new_node('&', lhs, bit_and());
+  }
+  return lhs;
+}
+
+Node *bit_xor() {
+  Node *lhs = bit_and();
+  if (tokens[pos].ty == '^') {
+    pos++;
+    return new_node('^', lhs, bit_xor());
+  }
+  return lhs;
+}
+
+Node *bit_or() {
+  Node *lhs = bit_xor();
+  if (tokens[pos].ty == '|') {
+    pos++;
+    return new_node('|', lhs, bit_or());
+  }
+  return lhs;
+}
+
+Node *assign() {
+  Node *lhs = bit_or();
   if (tokens[pos].ty == '=') {
     pos++;
     Node* node = new_node('=', lhs, assign());

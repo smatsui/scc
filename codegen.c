@@ -88,6 +88,15 @@ void gen(Node *node) {
     printf("  setle al\n");
     printf("  movzx rax, al\n");
     break;
+  case '&':
+    printf("and rax, rdi\n");
+    break;
+  case '^':
+    printf("xor rax, rdi\n");
+    break;
+  case '|':
+    printf("or rax, rdi\n");
+    break;
   }
 
   printf("  push rax\n");
