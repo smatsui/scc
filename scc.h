@@ -44,7 +44,7 @@ typedef struct {
 } Map;
 
 // Buffer for tokens
-extern Token tokens[100];
+extern Vector *tokens;
 extern int pos;
 
 // Buffer for parsed node.

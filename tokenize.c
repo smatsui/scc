@@ -5,13 +5,17 @@
 
 // Buffer for tokenized result.
 // Assumption: the max number of tokens are 100.
-Token tokens[100];
+Vector *tokens;
 
 // Index of tokens
 int pos;
 
+Token *new_token(int ty, char *input);
+Token *new_token_num(char *input, int val);
+
 void tokenize(char *p) {
-  int i = 0;
+  tokens = new_vector();
+
   while (*p) {
     if (isspace(*p)) {
       p++;
@@ -20,37 +24,28 @@ void tokenize(char *p) {
 
     // "=="
     if(*p == '=' && *(p+1) == '='){
-      //this is "=="
-      tokens[i].ty = TK_EQUAL;
-      tokens[i].input = p;
-      i++;
+      vec_push(tokens, new_token(TK_EQUAL, p));
       p = p + 2;
       continue;
     }
 
     // "!="
     if(*p == '!' && *(p+1) == '='){
-      tokens[i].ty = TK_NOT_EQUAL;
-      tokens[i].input = p;
-      i++;
+      vec_push(tokens, new_token(TK_NOT_EQUAL, p));
       p = p + 2;
       continue;
     }
 
     // >=
     if(*p == '>' && *(p+1) == '='){
-      tokens[i].ty = TK_GREATER_EQUAL;
-      tokens[i].input = p;
-      i++;
+      vec_push(tokens, new_token(TK_GREATER_EQUAL, p));
       p = p+2;
       continue;
     }
 
     // <=
     if(*p == '<' && *(p+1) == '='){
-      tokens[i].ty = TK_LESS_EQUAL;
-      tokens[i].input = p;
-      i++;
+      vec_push(tokens, new_token(TK_LESS_EQUAL, p));
       p = p+2;
       continue;
     }
@@ -58,25 +53,18 @@ void tokenize(char *p) {
     if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' ||
         *p == ')' || *p == '=' || *p == ';' || *p == '<' || *p == '>' ||
         *p == '&' || *p == '^' || *p == '|') {
-      tokens[i].ty = *p;
-      tokens[i].input = p;
-      i++;
+      vec_push(tokens, new_token(*p, p));
       p++;
       continue;
     }
 
     if (isdigit(*p)) {
-      tokens[i].ty = TK_NUM;
-      tokens[i].input = p;
-      tokens[i].val = strtol(p, &p, 10);
-      i++;
+      vec_push(tokens, new_token_num(p, strtol(p, &p, 10)));
       continue;
     }
 
     if('a' <= *p && *p <= 'z'){
-      tokens[i].ty = TK_IDENT;
-      tokens[i].input = p;
-      i++;
+      vec_push(tokens, new_token(TK_IDENT, p));
       p++;
       continue;
     }
@@ -85,6 +73,20 @@ void tokenize(char *p) {
     exit(1);
   }
 
-  tokens[i].ty = TK_EOF;
-  tokens[i].input = p;
+  vec_push(tokens, new_token(TK_EOF, p));
+}
+
+Token *new_token(int ty, char *input){
+  Token *token = calloc(1, sizeof(Token));
+  token->ty = ty;
+  token->input = input;
+  return token;
+}
+
+Token *new_token_num(char *input, int val){
+  Token *token = calloc(1, sizeof(Token));
+  token->ty = TK_NUM;
+  token->input = input;
+  token->val = val;
+  return token;
 }

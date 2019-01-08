@@ -57,32 +57,32 @@ Node *new_node_ident(char name){
 }
 
 Node *term() {
-  if (tokens[pos].ty == TK_NUM) {
-    return new_node_num(tokens[pos++].val);
+  if (((Token *)tokens->data[pos])->ty == TK_NUM) {
+    return new_node_num(((Token *)tokens->data[pos++])->val);
   }
-  if (tokens[pos].ty == TK_IDENT) {
-    return new_node_ident(tokens[pos++].input[0]);
+  if (((Token *)tokens->data[pos])->ty == TK_IDENT) {
+    return new_node_ident(((Token *)tokens->data[pos++])->input[0]);
   }
-  if (tokens[pos].ty == '(') {
+  if (((Token *)tokens->data[pos])->ty == '(') {
     pos++;
     Node *node = expr();
-    if (tokens[pos].ty != ')') {
-      error("there is no right parenthesis: %s", tokens[pos].input);
+    if (((Token *)tokens->data[pos])->ty != ')') {
+      error("there is no right parenthesis: %s", ((Token *)tokens->data[pos])->input);
     }
     pos++;
     return node;
   }
-  error("not a number or a left parenthesis: %s", tokens[pos].input);
+  error("not a number or a left parenthesis: %s", ((Token *)tokens->data[pos])->input);
   return 0;
 }
 
 Node *mul() {
   Node *lhs = term();
-  if (tokens[pos].ty == '*') {
+  if (((Token *)tokens->data[pos])->ty == '*') {
     pos++;
     return new_node('*', lhs, mul());
   }
-  if (tokens[pos].ty == '/') {
+  if (((Token *)tokens->data[pos])->ty == '/') {
     pos++;
     return new_node('/', lhs, mul());
   }
@@ -91,11 +91,11 @@ Node *mul() {
 
 Node *expr() {
   Node *lhs = mul();
-  if (tokens[pos].ty == '+') {
+  if (((Token *)tokens->data[pos])->ty == '+') {
     pos++;
     return new_node('+', lhs, expr());
   }
-  if (tokens[pos].ty == '-') {
+  if (((Token *)tokens->data[pos])->ty == '-') {
     pos++;
     return new_node('-', lhs, expr());
   }
@@ -104,19 +104,19 @@ Node *expr() {
 
 Node *cmp() {
   Node *lhs = expr();
-  if (tokens[pos].ty == '>') {
+  if (((Token *)tokens->data[pos])->ty == '>') {
     pos++;
     return new_node('>', lhs, cmp());
   }
-  if (tokens[pos].ty == '<') {
+  if (((Token *)tokens->data[pos])->ty == '<') {
     pos++;
     return new_node('<', lhs, cmp());
   }
-  if (tokens[pos].ty == TK_GREATER_EQUAL) {
+  if (((Token *)tokens->data[pos])->ty == TK_GREATER_EQUAL) {
     pos++;
     return new_node(ND_GREATER_EQUAL, lhs, cmp());
   }
-  if (tokens[pos].ty == TK_LESS_EQUAL) {
+  if (((Token *)tokens->data[pos])->ty == TK_LESS_EQUAL) {
     pos++;
     return new_node(ND_LESS_EQUAL, lhs, cmp());
   }
@@ -125,11 +125,11 @@ Node *cmp() {
 
 Node *equ() {
   Node *lhs = cmp();
-  if (tokens[pos].ty == TK_EQUAL) {
+  if (((Token *)tokens->data[pos])->ty == TK_EQUAL) {
     pos++;
     return new_node(ND_EQUAL, lhs, equ());
   }
-  if (tokens[pos].ty == TK_NOT_EQUAL) {
+  if (((Token *)tokens->data[pos])->ty == TK_NOT_EQUAL) {
     pos++;
     return new_node(ND_NOT_EQUAL, lhs, equ());
   }
@@ -138,7 +138,7 @@ Node *equ() {
 
 Node *bit_and() {
   Node *lhs = equ();
-  if (tokens[pos].ty == '&') {
+  if (((Token *)tokens->data[pos])->ty == '&') {
     pos++;
     return new_node('&', lhs, bit_and());
   }
@@ -147,7 +147,7 @@ Node *bit_and() {
 
 Node *bit_xor() {
   Node *lhs = bit_and();
-  if (tokens[pos].ty == '^') {
+  if (((Token *)tokens->data[pos])->ty == '^') {
     pos++;
     return new_node('^', lhs, bit_xor());
   }
@@ -156,7 +156,7 @@ Node *bit_xor() {
 
 Node *bit_or() {
   Node *lhs = bit_xor();
-  if (tokens[pos].ty == '|') {
+  if (((Token *)tokens->data[pos])->ty == '|') {
     pos++;
     return new_node('|', lhs, bit_or());
   }
@@ -165,13 +165,13 @@ Node *bit_or() {
 
 Node *assign() {
   Node *lhs = bit_or();
-  if (tokens[pos].ty == '=') {
+  if (((Token *)tokens->data[pos])->ty == '=') {
     pos++;
     Node* node = new_node('=', lhs, assign());
     return node;
   }
-  if (tokens[pos].ty != ';') {
-    error("semicolon not found: %s", tokens[pos].input);
+  if (((Token *)tokens->data[pos])->ty != ';') {
+    error("semicolon not found: %s", ((Token *)tokens->data[pos])->input);
   }
   pos++;
   return lhs;
@@ -179,7 +179,7 @@ Node *assign() {
 
 void program() {
   int i = 0;
-  while(tokens[pos].ty != TK_EOF){
+  while(((Token *)tokens->data[pos])->ty != TK_EOF){
     code[i] = assign();
     i++;
   }
