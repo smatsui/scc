@@ -1,4 +1,7 @@
 *~
 *.o
 tmp*
-9cc
+scc
+GPATH
+GRTAGS
+GTAGS
