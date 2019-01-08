@@ -163,8 +163,26 @@ Node *bit_or() {
   return lhs;
 }
 
-Node *assign() {
+Node *logical_and() {
   Node *lhs = bit_or();
+  if (((Token *)tokens->data[pos])->ty == TK_AND) {
+    pos++;
+    return new_node(ND_AND, lhs, logical_and());
+  }
+  return lhs;
+}
+
+Node *logical_or() {
+  Node *lhs = logical_and();
+  if (((Token *)tokens->data[pos])->ty == TK_OR) {
+    pos++;
+    return new_node(ND_OR, lhs, logical_or());
+  }
+  return lhs;
+}
+
+Node *assign() {
+  Node *lhs = logical_or();
   if (((Token *)tokens->data[pos])->ty == '=') {
     pos++;
     Node* node = new_node('=', lhs, assign());

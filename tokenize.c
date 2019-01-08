@@ -50,6 +50,20 @@ void tokenize(char *p) {
       continue;
     }
 
+    // &&
+    if(*p == '&' && *(p+1) == '&'){
+      vec_push(tokens, new_token(TK_AND, p));
+      p = p+2;
+      continue;
+    }
+
+    // ||
+    if(*p == '|' && *(p+1) == '|'){
+      vec_push(tokens, new_token(TK_OR, p));
+      p = p+2;
+      continue;
+    }
+
     if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' ||
         *p == ')' || *p == '=' || *p == ';' || *p == '<' || *p == '>' ||
         *p == '&' || *p == '^' || *p == '|') {

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "scc.h"
 
-
 void gen_lval(Node *node){
   if (node->ty == ND_IDENT){
     printf("  mov rax, rbp\n");
@@ -95,6 +94,12 @@ void gen(Node *node) {
     printf("xor rax, rdi\n");
     break;
   case '|':
+    printf("or rax, rdi\n");
+    break;
+  case ND_AND:
+    printf("and rax, rdi\n");
+    break;
+  case ND_OR:
     printf("or rax, rdi\n");
     break;
   }

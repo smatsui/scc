@@ -6,6 +6,8 @@ enum {
   TK_NOT_EQUAL,     // "!="
   TK_GREATER_EQUAL, // ">="
   TK_LESS_EQUAL,    // "<="
+  TK_AND,           // "&&"
+  TK_OR,            // "||"
   TK_EOF,
 };
 
@@ -16,6 +18,8 @@ enum {
   ND_NOT_EQUAL,
   ND_GREATER_EQUAL,
   ND_LESS_EQUAL,
+  ND_AND,
+  ND_OR,
 };
 
 typedef struct {
