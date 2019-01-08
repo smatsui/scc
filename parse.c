@@ -3,7 +3,7 @@
 #include "scc.h"
 
 // Buffer for parsed node.
-Node *code[100];
+Vector *code;
 
 Node *assign();
 Node *bit_or();
@@ -178,10 +178,8 @@ Node *assign() {
 }
 
 void program() {
-  int i = 0;
+  code = new_vector();
   while(((Token *)tokens->data[pos])->ty != TK_EOF){
-    code[i] = assign();
-    i++;
+    vec_push(code, assign());
   }
-  code[i] = NULL;
 }

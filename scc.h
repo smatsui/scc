@@ -48,7 +48,7 @@ extern Vector *tokens;
 extern int pos;
 
 // Buffer for parsed node.
-extern Node *code[100];
+extern Vector *code;
 
 void tokenize(char *p);
 void program();
