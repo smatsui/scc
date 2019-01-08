@@ -1,7 +1,8 @@
+#include "scc.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include "scc.h"
+#include <string.h>
 
 void error(const char *format, ...) {
   va_list args;
@@ -15,6 +16,11 @@ int main(int argc, char **argv) {
   if (argc != 2) {
     fprintf(stderr, "Invalid number of arguments\n");
     return 1;
+  }
+
+  if(strcmp(argv[1], "-test") == 0){
+    runtest();
+    return 0;
   }
 
   tokenize(argv[1]);

@@ -9,6 +9,7 @@ scc: $(OBJS)
 $(OBJS): scc.h
 
 test: scc
+	./scc -test
 	./test.sh
 
 clean:
