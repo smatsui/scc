@@ -1,7 +1,7 @@
 #include "scc.h"
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include <string.h>
 
 void error(const char *format, ...) {
@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  if(strcmp(argv[1], "-test") == 0){
+  if (strcmp(argv[1], "-test") == 0) {
     runtest();
     return 0;
   }
@@ -30,12 +30,12 @@ int main(int argc, char **argv) {
   printf(".global _main\n");
   printf("_main:\n");
 
-  //prologue
+  // prologue
   printf("  push rbp\n");
   printf("  mov rbp, rsp\n");
-  printf("  sub rsp, 208\n");
+  printf("  sub rsp, %d\n", 8 * idents->keys->len);
 
-  for(int i=0; i<code->len; i++){
+  for (int i = 0; i < code->len; i++) {
     gen(((Node *)code->data[i]));
 
     printf("  pop rax\n");

@@ -29,11 +29,11 @@ typedef struct {
 } Token;
 
 typedef struct Node {
-  int ty;            // operator or ND_NUM
-  struct Node *lhs;  // left-hand side
-  struct Node *rhs;  // right-hand side
-  int val;           // for ND_NUM
-  char name;         // for ND_IDENT
+  int ty;           // operator or ND_NUM
+  struct Node *lhs; // left-hand side
+  struct Node *rhs; // right-hand side
+  int val;          // for ND_NUM
+  char name;        // for ND_IDENT
 } Node;
 
 typedef struct {
@@ -53,6 +53,9 @@ extern int pos;
 
 // Buffer for parsed node.
 extern Vector *code;
+
+// Buffer for variables
+extern Map *idents;
 
 void tokenize(char *p);
 void program();

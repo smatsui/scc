@@ -1,7 +1,7 @@
+#include "scc.h"
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include "scc.h"
 
 // Buffer for tokenized result.
 // Assumption: the max number of tokens are 100.
@@ -23,44 +23,44 @@ void tokenize(char *p) {
     }
 
     // "=="
-    if(*p == '=' && *(p+1) == '='){
+    if (*p == '=' && *(p + 1) == '=') {
       vec_push(tokens, new_token(TK_EQUAL, p));
       p = p + 2;
       continue;
     }
 
     // "!="
-    if(*p == '!' && *(p+1) == '='){
+    if (*p == '!' && *(p + 1) == '=') {
       vec_push(tokens, new_token(TK_NOT_EQUAL, p));
       p = p + 2;
       continue;
     }
 
     // >=
-    if(*p == '>' && *(p+1) == '='){
+    if (*p == '>' && *(p + 1) == '=') {
       vec_push(tokens, new_token(TK_GREATER_EQUAL, p));
-      p = p+2;
+      p = p + 2;
       continue;
     }
 
     // <=
-    if(*p == '<' && *(p+1) == '='){
+    if (*p == '<' && *(p + 1) == '=') {
       vec_push(tokens, new_token(TK_LESS_EQUAL, p));
-      p = p+2;
+      p = p + 2;
       continue;
     }
 
     // &&
-    if(*p == '&' && *(p+1) == '&'){
+    if (*p == '&' && *(p + 1) == '&') {
       vec_push(tokens, new_token(TK_AND, p));
-      p = p+2;
+      p = p + 2;
       continue;
     }
 
     // ||
-    if(*p == '|' && *(p+1) == '|'){
+    if (*p == '|' && *(p + 1) == '|') {
       vec_push(tokens, new_token(TK_OR, p));
-      p = p+2;
+      p = p + 2;
       continue;
     }
 
@@ -77,7 +77,7 @@ void tokenize(char *p) {
       continue;
     }
 
-    if('a' <= *p && *p <= 'z'){
+    if ('a' <= *p && *p <= 'z') {
       vec_push(tokens, new_token(TK_IDENT, p));
       p++;
       continue;
@@ -90,14 +90,14 @@ void tokenize(char *p) {
   vec_push(tokens, new_token(TK_EOF, p));
 }
 
-Token *new_token(int ty, char *input){
+Token *new_token(int ty, char *input) {
   Token *token = calloc(1, sizeof(Token));
   token->ty = ty;
   token->input = input;
   return token;
 }
 
-Token *new_token_num(char *input, int val){
+Token *new_token_num(char *input, int val) {
   Token *token = calloc(1, sizeof(Token));
   token->ty = TK_NUM;
   token->input = input;

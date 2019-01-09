@@ -1,11 +1,10 @@
-#include <stdio.h>
 #include "scc.h"
+#include <stdio.h>
 
-void gen_lval(Node *node){
-  if (node->ty == ND_IDENT){
+void gen_lval(Node *node) {
+  if (node->ty == ND_IDENT) {
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n",
-           ('z' - node->name + 1) * 8);
+    printf("  sub rax, %d\n", ((int)map_get(idents, &node->name) + 1) * 8);
     printf("  push rax\n");
     return;
   }
