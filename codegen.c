@@ -4,7 +4,7 @@
 void gen_lval(Node *node) {
   if (node->ty == ND_IDENT) {
     printf("  mov rax, rbp\n");
-    printf("  sub rax, %d\n", ((int)map_get(idents, &node->name) + 1) * 8);
+    printf("  sub rax, %d\n", ((int)map_get(idents, &node->name)) * 8);
     printf("  push rax\n");
     return;
   }
@@ -33,6 +33,20 @@ void gen(Node *node) {
     printf("  pop rax\n");
     printf("  mov [rax], rdi\n");
     printf("  push rdi\n");
+    return;
+  }
+
+  if (node->ty == ND_IF) {
+    gen(node->lhs);
+    printf("  pop rax\n");
+    printf("  cmp rax, 1\n");
+    printf("  push rax\n");
+    printf("  je if\n");
+    printf("  jmp finish\n");
+    printf("  if:\n");
+    gen(node->rhs);
+    printf("  jmp finish\n");
+    printf("  finish:\n");
     return;
   }
 

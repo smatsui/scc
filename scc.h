@@ -8,6 +8,7 @@ enum {
   TK_LESS_EQUAL,    // "<="
   TK_AND,           // "&&"
   TK_OR,            // "||"
+  TK_IF,            // if
   TK_EOF,
 };
 
@@ -20,6 +21,7 @@ enum {
   ND_LESS_EQUAL,
   ND_AND,
   ND_OR,
+  ND_IF,
 };
 
 typedef struct {
@@ -29,11 +31,11 @@ typedef struct {
 } Token;
 
 typedef struct Node {
-  int ty;           // operator or ND_NUM
-  struct Node *lhs; // left-hand side
-  struct Node *rhs; // right-hand side
-  int val;          // for ND_NUM
-  char name;        // for ND_IDENT
+  int ty;             // operator or ND_NUM
+  struct Node *lhs;   // left-hand side
+  struct Node *rhs;   // right-hand side
+  int val;            // for ND_NUM
+  char name;          // for ND_IDENT
 } Node;
 
 typedef struct {

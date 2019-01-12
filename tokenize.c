@@ -2,6 +2,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Buffer for tokenized result.
 // Assumption: the max number of tokens are 100.
@@ -12,6 +13,7 @@ int pos;
 
 Token *new_token(int ty, char *input);
 Token *new_token_num(char *input, int val);
+int consume(int ty);
 
 void tokenize(char *p) {
   tokens = new_vector();
@@ -64,9 +66,15 @@ void tokenize(char *p) {
       continue;
     }
 
+    if (memcmp(p, "if", 2) == 0){
+      vec_push(tokens, new_token(TK_IF, p));
+      p = p + 2;
+      continue;
+    }
+
     if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' ||
         *p == ')' || *p == '=' || *p == ';' || *p == '<' || *p == '>' ||
-        *p == '&' || *p == '^' || *p == '|') {
+        *p == '&' || *p == '^' || *p == '|' || *p == '{' || *p == '}') {
       vec_push(tokens, new_token(*p, p));
       p++;
       continue;
