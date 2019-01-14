@@ -37,16 +37,27 @@ void gen(Node *node) {
   }
 
   if (node->ty == ND_IF) {
-    gen(node->lhs);
+    gen(node->cond);
     printf("  pop rax\n");
     printf("  cmp rax, 1\n");
     printf("  push rax\n");
     printf("  je if\n");
-    printf("  jmp finish\n");
-    printf("  if:\n");
-    gen(node->rhs);
-    printf("  jmp finish\n");
-    printf("  finish:\n");
+    if(node->else_body != NULL) {
+      printf("  jmp else\n");
+      printf("  if:\n");
+      gen(node->body);
+      printf("  jmp finish\n");
+      printf("  else:\n");
+      gen(node->else_body);
+      printf("  jmp finish\n");
+      printf("  finish:\n");
+    }else {
+      printf("  jmp finish\n");
+      printf("  if:\n");
+      gen(node->body);
+      printf("  jmp finish\n");
+      printf("  finish:\n");
+    }
     return;
   }
 

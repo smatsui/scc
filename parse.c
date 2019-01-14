@@ -41,6 +41,8 @@ void print_tree(Node *node) {
     printf("!=\n");
   } else if (node->ty == ND_IF) {
     printf("if\n");
+  } else if (node->ty == ND_ELSE) {
+    printf("else\n");
   } else {
     printf("%c\n", (char)node->ty);
   }
@@ -53,6 +55,15 @@ Node *new_node(int ty, Node *lhs, Node *rhs) {
   node->ty = ty;
   node->lhs = lhs;
   node->rhs = rhs;
+  return node;
+}
+
+Node *new_if_node(Node *cond, Node *if_body, Node *else_body) {
+  Node *node = calloc(1, sizeof(Node));
+  node->ty = ND_IF;
+  node->cond = cond;
+  node->body = if_body;
+  node->else_body = else_body;
   return node;
 }
 
@@ -205,9 +216,14 @@ Node *stmt() {
     }
     Node *cond = equ();
     if (!consume(')')){
-      error("right parent not found: %s",((Token *)tokens->data[pos])->input);
+      error("right paren not found: %s",((Token *)tokens->data[pos])->input);
     }
-    return new_node(ND_IF, cond, stmt());
+    Node *if_body= assign();
+    if (consume(TK_ELSE)) {
+      return new_if_node(cond, if_body, assign());
+    } else {
+      return new_if_node(cond, if_body, NULL);
+    }
   }
   return assign();
 }
@@ -218,6 +234,6 @@ void program() {
   while (((Token *)tokens->data[pos])->ty != TK_EOF) {
     Node *node = stmt();
     vec_push(code, node);
-    //    print_tree(node);
+    //print_tree(node);
   }
 }
