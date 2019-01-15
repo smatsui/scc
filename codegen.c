@@ -63,11 +63,25 @@ void gen(Node *node) {
 
   if (node->ty == ND_WHILE) {
     printf("  begin:\n");
-    gen(node->lhs);
+    gen(node->cond);
     printf("  pop rax\n");
     printf("  cmp rax, 1\n");
     printf("  jne end\n");
-    gen(node->rhs);
+    gen(node->body);
+    printf("  jmp begin\n");
+    printf("  end:\n");
+    return;
+  }
+
+  if (node->ty == ND_FOR) {
+    gen(node->init);
+    printf("  begin:\n");
+    gen(node->cond);
+    printf("  pop rax\n");
+    printf("  cmp rax, 1\n");
+    printf("  jne end\n");
+    gen(node->inc);
+    gen(node->body);
     printf("  jmp begin\n");
     printf("  end:\n");
     return;

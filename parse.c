@@ -67,6 +67,24 @@ Node *new_if_node(Node *cond, Node *if_body, Node *else_body) {
   return node;
 }
 
+Node *new_while_node(Node *cond, Node *body){
+  Node *node = calloc(1, sizeof(Node));
+  node->ty = ND_WHILE;
+  node->cond = cond;
+  node->body = body;
+  return node;
+}
+
+Node *new_for_node(Node *init, Node *cond, Node *inc, Node *body){
+  Node *node = calloc(1, sizeof(Node));
+  node->ty = ND_FOR;
+  node->init = init;
+  node->cond = cond;
+  node->inc = inc;
+  node->body = body;
+  return node;
+}
+
 Node *new_node_num(int val) {
   Node *node = calloc(1, sizeof(Node));
   node->ty = ND_NUM;
@@ -202,11 +220,12 @@ Node *assign() {
     Node *node = new_node('=', lhs, assign());
     return node;
   }
-  if (consume(';')) {
-    return lhs;
-  }
-  error("semicolon not found: %s", ((Token *)tokens->data[pos])->input);
-  return 0;
+  /* if (consume(';')) { */
+  /*   return lhs; */
+  /* } */
+  /* error("semicolon not found: %s", ((Token *)tokens->data[pos])->input); */
+  /* return 0; */
+  return lhs;
 }
 
 Node *stmt() {
@@ -218,9 +237,11 @@ Node *stmt() {
     if (!consume(')')){
       error("right paren not found: %s",((Token *)tokens->data[pos])->input);
     }
-    Node *if_body= assign();
+    //    Node *if_body= assign();
+    Node *if_body= stmt();
     if (consume(TK_ELSE)) {
-      return new_if_node(cond, if_body, assign());
+      //      return new_if_node(cond, if_body, assign());
+      return new_if_node(cond, if_body, stmt());
     } else {
       return new_if_node(cond, if_body, NULL);
     }
@@ -234,9 +255,34 @@ Node *stmt() {
     if (!consume(')')) {
       error("right paren not found: %s",((Token *)tokens->data[pos])->input);
     }
-    return new_node(ND_WHILE, cond, assign());
+    //    return new_while_node(cond, assign());
+    return new_while_node(cond, stmt());
   }
-  return assign();
+
+  if (consume(TK_FOR)) {
+    if (!consume('(')) {
+      error("left paren not found %s", ((Token *)tokens->data[pos])->input);
+    }
+    Node *init = assign();
+    if(!consume(';')) {
+      error("semicolon not found %s", ((Token *)tokens->data[pos])->input);
+    }
+    Node *cond = assign();
+    if(!consume(';')) {
+      error("semicolon not found %s", ((Token *)tokens->data[pos])->input);
+    }
+    Node *inc = assign();
+    if (!consume(')')) {
+      error("right paren not found: %s",((Token *)tokens->data[pos])->input);
+    }
+    //return new_for_node(init, cond, inc, assign());
+    return new_for_node(init, cond, inc, stmt());
+  }
+  Node *node = assign();
+  if(!consume(';')) {
+    error("semicolon not found: %s", ((Token *)tokens->data[pos])->input);
+  }
+  return node;
 }
 
 void program() {

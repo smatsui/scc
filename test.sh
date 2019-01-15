@@ -59,4 +59,5 @@ try 4 "3; if(1!=1) 5; 4;"
 try 1 "if(1==1) 1; else 2;"
 try 2 "if(1!=1) 1; else 2;"
 try 100 "a=0; while(a<100) a=a+1;"
+try 200 "for(a=0; a<200; a=a+1) a;"
 echo OK

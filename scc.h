@@ -11,6 +11,7 @@ enum {
   TK_IF,            // if
   TK_ELSE,          // else
   TK_WHILE,         // while
+  TK_FOR,           // for
   TK_EOF,
 };
 
@@ -26,6 +27,7 @@ enum {
   ND_IF,
   ND_ELSE,
   ND_WHILE,
+  ND_FOR,
 };
 
 typedef struct {
@@ -34,13 +36,16 @@ typedef struct {
   char *input; // for error message
 } Token;
 
+// TODO: use union to reduce the size of this structure
 typedef struct Node {
   int ty;                 // operator or ND_NUM
   struct Node *lhs;       // left-hand side
   struct Node *rhs;       // right-hand side
   struct Node *cond;      // for if/while statement
-  struct Node *body;      // for if/while statement
+  struct Node *body;      // for if/while/for statement
   struct Node *else_body; // for if-else statement
+  struct Node *init;      // "for" statement
+  struct Node *inc;       // "for" statement
   int val;                // for ND_NUM
   char name;              // for ND_IDENT
 } Node;
