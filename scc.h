@@ -10,6 +10,7 @@ enum {
   TK_OR,            // "||"
   TK_IF,            // if
   TK_ELSE,          // else
+  TK_WHILE,         // while
   TK_EOF,
 };
 
@@ -24,6 +25,7 @@ enum {
   ND_OR,
   ND_IF,
   ND_ELSE,
+  ND_WHILE,
 };
 
 typedef struct {

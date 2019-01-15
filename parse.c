@@ -225,6 +225,17 @@ Node *stmt() {
       return new_if_node(cond, if_body, NULL);
     }
   }
+
+  if (consume(TK_WHILE)) {
+    if (!consume('(')) {
+      error("left paren not found %s", ((Token *)tokens->data[pos])->input);
+    }
+    Node *cond = equ();
+    if (!consume(')')) {
+      error("right paren not found: %s",((Token *)tokens->data[pos])->input);
+    }
+    return new_node(ND_WHILE, cond, assign());
+  }
   return assign();
 }
 
