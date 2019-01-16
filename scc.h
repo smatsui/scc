@@ -31,9 +31,10 @@ enum {
 };
 
 typedef struct {
-  int ty;      // token type
-  int val;     // value for TK_NUM type
-  char *input; // for error message
+  int ty;         // token type
+  int val;        // value for TK_NUM type
+  char name[100]; //name for TK_IDENT type
+  char *input;    // for error message
 } Token;
 
 // TODO: use union to reduce the size of this structure
@@ -47,7 +48,7 @@ typedef struct Node {
   struct Node *init;      // "for" statement
   struct Node *inc;       // "for" statement
   int val;                // for ND_NUM
-  char name;              // for ND_IDENT
+  char name[100];         // for ND_IDENT
 } Node;
 
 typedef struct {

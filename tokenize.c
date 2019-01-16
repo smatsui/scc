@@ -13,6 +13,7 @@ int pos;
 
 Token *new_token(int ty, char *input);
 Token *new_token_num(char *input, int val);
+Token *new_token_ident(char *input, char *name, int length);
 int consume(int ty);
 
 void tokenize(char *p) {
@@ -104,8 +105,14 @@ void tokenize(char *p) {
     }
 
     if ('a' <= *p && *p <= 'z') {
-      vec_push(tokens, new_token(TK_IDENT, p));
-      p++;
+      char name[100];
+      int i = 0;
+      while ('a' <= *p && *p <= 'z') {
+        name[i] = *p;
+        p++;
+        i++;
+      }
+      vec_push(tokens, new_token_ident(p, name, i));
       continue;
     }
 
@@ -128,5 +135,14 @@ Token *new_token_num(char *input, int val) {
   token->ty = TK_NUM;
   token->input = input;
   token->val = val;
+  return token;
+}
+
+Token *new_token_ident(char *input, char *name, int length) {
+  Token *token = calloc(1, sizeof(Token));
+  token->ty = TK_IDENT;
+  token->input = input;
+  memcpy(token->name, name, length);
+  token->name[length] = '\0';
   return token;
 }

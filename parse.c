@@ -1,6 +1,7 @@
 #include "scc.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Buffer for parsed node.
 Vector *code;
@@ -34,7 +35,7 @@ void print_tree(Node *node) {
   if (node->ty == ND_NUM) {
     printf("%d\n", node->val);
   } else if (node->ty == ND_IDENT) {
-    printf("%c\n", node->name);
+    printf("%s\n", node->name);
   } else if (node->ty == ND_EQUAL) {
     printf("==\n");
   } else if (node->ty == ND_NOT_EQUAL) {
@@ -92,13 +93,13 @@ Node *new_node_num(int val) {
   return node;
 }
 
-Node *new_node_ident(char name) {
+Node *new_node_ident(char* name) {
   static int ident_id = 1;
   Node *node = calloc(1, sizeof(Node));
   node->ty = ND_IDENT;
-  node->name = name;
-  if(!map_get(idents, &node->name)){
-    map_put(idents, &node->name, (void *)ident_id++);
+  strcpy(node->name, name);
+  if(!map_get(idents, node->name)){
+    map_put(idents, node->name, (void *)ident_id++);
   }
   return node;
 }
@@ -108,7 +109,7 @@ Node *term() {
     return new_node_num(((Token *)tokens->data[pos++])->val);
   }
   if (((Token *)tokens->data[pos])->ty == TK_IDENT) {
-    return new_node_ident(((Token *)tokens->data[pos++])->input[0]);
+    return new_node_ident(((Token *)tokens->data[pos++])->name);
   }
   if (consume('(')) {
     Node *node = add();
@@ -220,11 +221,6 @@ Node *assign() {
     Node *node = new_node('=', lhs, assign());
     return node;
   }
-  /* if (consume(';')) { */
-  /*   return lhs; */
-  /* } */
-  /* error("semicolon not found: %s", ((Token *)tokens->data[pos])->input); */
-  /* return 0; */
   return lhs;
 }
 
@@ -237,10 +233,8 @@ Node *stmt() {
     if (!consume(')')){
       error("right paren not found: %s",((Token *)tokens->data[pos])->input);
     }
-    //    Node *if_body= assign();
     Node *if_body= stmt();
     if (consume(TK_ELSE)) {
-      //      return new_if_node(cond, if_body, assign());
       return new_if_node(cond, if_body, stmt());
     } else {
       return new_if_node(cond, if_body, NULL);
@@ -255,7 +249,6 @@ Node *stmt() {
     if (!consume(')')) {
       error("right paren not found: %s",((Token *)tokens->data[pos])->input);
     }
-    //    return new_while_node(cond, assign());
     return new_while_node(cond, stmt());
   }
 
@@ -275,7 +268,6 @@ Node *stmt() {
     if (!consume(')')) {
       error("right paren not found: %s",((Token *)tokens->data[pos])->input);
     }
-    //return new_for_node(init, cond, inc, assign());
     return new_for_node(init, cond, inc, stmt());
   }
   Node *node = assign();
