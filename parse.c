@@ -44,6 +44,8 @@ void print_tree(Node *node) {
     printf("if\n");
   } else if (node->ty == ND_ELSE) {
     printf("else\n");
+  } else if (node->ty == ND_FUNC) {
+    printf("%s()\n", node->name);
   } else {
     printf("%c\n", (char)node->ty);
   }
@@ -104,12 +106,28 @@ Node *new_node_ident(char* name) {
   return node;
 }
 
+Node *new_node_func(char* name) {
+  Node *node = calloc(1, sizeof(Node));
+  node->ty = ND_FUNC;
+  strcpy(node->name, name);
+  return node;
+}
+
 Node *term() {
   if (((Token *)tokens->data[pos])->ty == TK_NUM) {
     return new_node_num(((Token *)tokens->data[pos++])->val);
   }
   if (((Token *)tokens->data[pos])->ty == TK_IDENT) {
-    return new_node_ident(((Token *)tokens->data[pos++])->name);
+    char name[100];
+    strcpy(name, ((Token *)tokens->data[pos++])->name);
+    if (((Token *)tokens->data[pos])->ty != '(') {
+      return new_node_ident(name);
+    }
+    pos++;
+    if (!consume(')')) {
+      error("right parenthesis not found: %s", ((Token *)tokens->data[pos])->input);
+    }
+    return new_node_func(name);
   }
   if (consume('(')) {
     Node *node = add();
@@ -272,7 +290,7 @@ Node *stmt() {
   }
   Node *node = assign();
   if(!consume(';')) {
-    error("semicolon not found: %s", ((Token *)tokens->data[pos])->input);
+    error("semicolon not found!: %s", ((Token *)tokens->data[pos])->input);
   }
   return node;
 }

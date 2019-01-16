@@ -12,6 +12,7 @@ enum {
   TK_ELSE,          // else
   TK_WHILE,         // while
   TK_FOR,           // for
+  TK_FUNC,          // function
   TK_EOF,
 };
 
@@ -28,12 +29,13 @@ enum {
   ND_ELSE,
   ND_WHILE,
   ND_FOR,
+  ND_FUNC,
 };
 
 typedef struct {
   int ty;         // token type
   int val;        // value for TK_NUM type
-  char name[100]; //name for TK_IDENT type
+  char name[100]; //name for TK_IDENT ot TK_FUNC type
   char *input;    // for error message
 } Token;
 
