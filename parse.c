@@ -106,10 +106,13 @@ Node *new_node_ident(char* name) {
   return node;
 }
 
-Node *new_node_func(char* name) {
+//Supports upto two parameters
+Node *new_node_func(char *name, Node *lhs, Node *rhs) {
   Node *node = calloc(1, sizeof(Node));
   node->ty = ND_FUNC;
   strcpy(node->name, name);
+  node->lhs = lhs;
+  node->rhs = rhs;
   return node;
 }
 
@@ -124,10 +127,20 @@ Node *term() {
       return new_node_ident(name);
     }
     pos++;
-    if (!consume(')')) {
-      error("right parenthesis not found: %s", ((Token *)tokens->data[pos])->input);
+    Node *param[2];
+    for (int i = 0; i<2; i++) {
+      if (consume(')')) {
+        break;
+      }
+      param[i] = assign();
+      if (consume(')')) {
+        break;
+      }
+      if(!consume(',')) {
+        error("comma is expected: %s", ((Token *)tokens->data[pos])->input);
+      }
     }
-    return new_node_func(name);
+    return new_node_func(name, param[0], param[1]);
   }
   if (consume('(')) {
     Node *node = add();

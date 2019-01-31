@@ -12,7 +12,6 @@ enum {
   TK_ELSE,          // else
   TK_WHILE,         // while
   TK_FOR,           // for
-  TK_FUNC,          // function
   TK_EOF,
 };
 
@@ -41,16 +40,16 @@ typedef struct {
 
 // TODO: use union to reduce the size of this structure
 typedef struct Node {
-  int ty;                 // operator or ND_NUM
-  struct Node *lhs;       // left-hand side
-  struct Node *rhs;       // right-hand side
-  struct Node *cond;      // for if/while statement
-  struct Node *body;      // for if/while/for statement
-  struct Node *else_body; // for if-else statement
-  struct Node *init;      // "for" statement
-  struct Node *inc;       // "for" statement
-  int val;                // for ND_NUM
-  char name[100];         // for ND_IDENT
+  int ty;                   // operator or ND_NUM
+  struct Node *lhs;         // left-hand side
+  struct Node *rhs;         // right-hand side
+  struct Node *cond;        // if/while statement
+  struct Node *body;        // if/while/for statement
+  struct Node *else_body;   // if-else statement
+  struct Node *init;        // "for" statement
+  struct Node *inc;         // "for" statement
+  int val;                  // ND_NUM
+  char name[100];           // ND_IDENT
 } Node;
 
 typedef struct {
