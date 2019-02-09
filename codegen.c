@@ -12,6 +12,10 @@ void gen_lval(Node *node) {
 }
 
 void gen(Node *node) {
+  if (node == NULL) {
+    return;
+  }
+
   if (node->ty == ND_NUM) {
     printf("  push %d\n", node->val);
     return;
@@ -28,9 +32,14 @@ void gen(Node *node) {
   if (node->ty == ND_FUNC) {
     gen(node->lhs);
     gen(node->rhs);
-    printf("  pop rdi\n");
-    printf("  pop rsi\n");
+    if (node->lhs != NULL) {
+      printf("  pop rdi\n");
+    }
+    if (node->rhs != NULL) {
+      printf("  pop rsi\n");
+    }
     printf("  call _%s\n", node->name);
+    printf("  push rax\n");
     return;
   }
 

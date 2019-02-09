@@ -4,7 +4,9 @@ try() {
   input="$2"
 
   ./scc "$input" > tmp.s
-  gcc -o tmp tmp.s
+  cc -c -o tmp.o tmp.s
+  cc -c -o foo.o test/foo.c
+  cc -o tmp tmp.o foo.o
   ./tmp
   actual="$?"
 
@@ -31,7 +33,7 @@ try 4 "a=2; b=1+2; c=(3+5)/2;"
 try 3 "a=b=(12+3)/5;"
 try 6 "a=b=3; a+b;"
 try 5 "abc=2; abc+3;"
-try 5 "abc=2; def=3; abc+def;"
+try 5 "abc1=2; def2=3; abc1+def2;"
 try 1 "0 == 0;"
 try 0 "0 != 0;"
 try 0 "1 == 0;"
@@ -62,4 +64,7 @@ try 1 "if(1==1) 1; else 2;"
 try 2 "if(1!=1) 1; else 2;"
 try 100 "a=0; while(a<100) a=a+1;"
 try 200 "for(a=0; a<200; a=a+1) a;"
+try 23 "foo1();"
+try 3 "foo2(3);"
+try 3 "foo3(1, 2);"
 echo OK
