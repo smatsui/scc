@@ -11,6 +11,26 @@ void gen_lval(Node *node) {
   error("lval is not a variable");
 }
 
+void gen_func(Func* func){
+  printf("_%s:\n", func->name);
+
+  // prologue
+  printf("  push rbp\n");
+  printf("  mov rbp, rsp\n");
+  printf("  sub rsp, %d\n", 8 * idents->keys->len);
+
+  for(int i=0; i<func->code->len; i++) {
+    gen((Node *)func->code->data[i]);
+
+    printf("  pop rax\n");
+  }
+
+  // epilogue
+  printf("  mov rsp, rbp\n");
+  printf("  pop rbp\n");
+  printf("  ret\n");
+}
+
 void gen(Node *node) {
   if (node == NULL) {
     return;

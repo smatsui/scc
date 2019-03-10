@@ -1,6 +1,8 @@
 *~
 *.o
 tmp*
+.*
+#*
 scc
 GPATH
 GRTAGS

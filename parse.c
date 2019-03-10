@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Buffer for parsed node.
-Vector *code;
+// Buffer for functions.
+Vector *funcs;
 
 // Buffer for variables
 Map *idents;
@@ -308,12 +308,46 @@ Node *stmt() {
   return node;
 }
 
+Func *func() {
+  if (((Token *)tokens->data[pos])->ty == TK_IDENT) {
+    Func *func = calloc(1, sizeof(Func));
+    func->code = new_vector();
+    strcpy(func->name, ((Token *)tokens->data[pos++])->name);
+    if (!consume('(')) {
+      error("left parent not found %s", ((Token *)tokens->data[pos])->input);
+    }
+    //TODO: handle parameters
+    if (!consume(')')) {
+      error("right parent not found %s", ((Token *)tokens->data[pos])->input);
+    }
+    if (!consume('{')) {
+      error("rightbrace not found %s", ((Token *)tokens->data[pos])->input);
+    }
+
+    while (((Token *)tokens->data[pos])->ty != '}'&&
+           ((Token *)tokens->data[pos])->ty != TK_EOF) {
+      Node *node = stmt();
+      vec_push(func->code, node);
+      //      print_tree(node);
+    }
+
+    if (!consume('}')) {
+      error("rightbrace not found %s", ((Token *)tokens->data[pos])->input);
+    }
+
+    return func;
+  }
+  error("Not a function: %s",  ((Token *)tokens->data[pos])->input);
+  return NULL;
+}
+
 void program() {
-  code = new_vector();
+  //  code = new_vector();
   idents = new_map();
+  funcs = new_vector();
+
   while (((Token *)tokens->data[pos])->ty != TK_EOF) {
-    Node *node = stmt();
-    vec_push(code, node);
-    //print_tree(node);
+    Func *f = func();
+    vec_push(funcs, f);
   }
 }

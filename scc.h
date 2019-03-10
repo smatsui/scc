@@ -67,8 +67,12 @@ typedef struct {
 extern Vector *tokens;
 extern int pos;
 
-// Buffer for parsed node.
-extern Vector *code;
+typedef struct {
+  char name[100];
+  Vector *code;
+} Func;
+
+extern Vector *funcs;
 
 // Buffer for variables
 extern Map *idents;
@@ -76,6 +80,7 @@ extern Map *idents;
 void tokenize(char *p);
 void program();
 void gen(Node *node);
+void gen_func(Func *func);
 void error(const char *format, ...);
 void runtest();
 

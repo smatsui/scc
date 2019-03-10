@@ -28,23 +28,10 @@ int main(int argc, char **argv) {
 
   printf(".intel_syntax noprefix\n");
   printf(".global _main\n");
-  printf("_main:\n");
 
-  // prologue
-  printf("  push rbp\n");
-  printf("  mov rbp, rsp\n");
-  printf("  sub rsp, %d\n", 8 * idents->keys->len);
-
-  for (int i = 0; i < code->len; i++) {
-    gen(((Node *)code->data[i]));
-
-    printf("  pop rax\n");
+  for (int i = 0; i < funcs->len; i++) {
+    gen_func((Func *)funcs->data[i]);
   }
-
-  // epilogue
-  printf("  mov rsp, rbp\n");
-  printf("  pop rbp\n");
-  printf("  ret\n");
 
   return 0;
 }
