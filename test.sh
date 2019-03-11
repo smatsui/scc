@@ -69,4 +69,5 @@ try 3 "main(){foo2(3);}"
 try 3 "main(){foo3(1, 2);}"
 try 2 "main(){bar();} bar(){2;}"
 try 5 "main(){bar();} bar(){a=2;b=3; a+b;}"
+try 6 "main(){c=bar(); c+1;} bar(){a=2;b=3; a+b;}"
 echo OK
