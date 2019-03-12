@@ -127,12 +127,12 @@ Node *term() {
       return new_node_ident(name);
     }
     pos++;
-    Node *param[2];
+    Node *arg[2];
     for (int i = 0; i<2; i++) {
       if (consume(')')) {
         break;
       }
-      param[i] = assign();
+      arg[i] = assign();
       if (consume(')')) {
         break;
       }
@@ -140,7 +140,7 @@ Node *term() {
         error("comma is expected: %s", ((Token *)tokens->data[pos])->input);
       }
     }
-    return new_node_func(name, param[0], param[1]);
+    return new_node_func(name, arg[0], arg[1]);
   }
   if (consume('(')) {
     Node *node = add();
@@ -316,10 +316,23 @@ Func *func() {
     if (!consume('(')) {
       error("left parent not found %s", ((Token *)tokens->data[pos])->input);
     }
-    //TODO: handle parameters
-    if (!consume(')')) {
-      error("right parent not found %s", ((Token *)tokens->data[pos])->input);
+    Node *param[2] = {NULL, NULL};
+    for(int i=0; i<2; i++) {
+      if(consume(')')){
+        break;
+      }
+      param[i] = new_node_ident(((Token *)tokens->data[pos++])->name);
+
+      if(consume(')')){
+        break;
+      }
+
+      if(!consume(',')) {
+        error("comma is expected: %s", ((Token *)tokens->data[pos])->input);
+      }
     }
+    func->lhs = param[0];
+    func->rhs = param[1];
     if (!consume('{')) {
       error("rightbrace not found %s", ((Token *)tokens->data[pos])->input);
     }
@@ -342,7 +355,6 @@ Func *func() {
 }
 
 void program() {
-  //  code = new_vector();
   idents = new_map();
   funcs = new_vector();
 

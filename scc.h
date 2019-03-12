@@ -70,6 +70,8 @@ extern int pos;
 typedef struct {
   char name[100];
   Vector *code;
+  Node* lhs; //first param
+  Node* rhs; //second param
 } Func;
 
 extern Vector *funcs;

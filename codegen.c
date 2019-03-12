@@ -19,9 +19,21 @@ void gen_func(Func* func){
   printf("  mov rbp, rsp\n");
   printf("  sub rsp, %d\n", 8 * idents->keys->len);
 
+  if (func->lhs != NULL) {
+    gen_lval(func->lhs);
+    printf("  pop rax\n");
+    printf("  mov [rax], rdi\n");
+    printf("  push rdi\n");
+  }
+
+  /* if (func->rhs != NULL) { */
+  /*   printf("  mov rax, rbp\n"); */
+  /*   printf("  sub rax, %d\n", ((int)map_get(idents, func->rhs->name)) * 8); */
+  /*   printf("  push rax\n"); */
+  /* } */
+
   for(int i=0; i<func->code->len; i++) {
     gen((Node *)func->code->data[i]);
-
     printf("  pop rax\n");
   }
 
