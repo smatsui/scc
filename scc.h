@@ -12,6 +12,7 @@ enum {
   TK_ELSE,          // else
   TK_WHILE,         // while
   TK_FOR,           // for
+  TK_RETURN,        // return
   TK_EOF,
 };
 
@@ -29,6 +30,7 @@ enum {
   ND_WHILE,
   ND_FOR,
   ND_FUNC,
+  ND_RETURN,
 };
 
 typedef struct {

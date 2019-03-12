@@ -91,6 +91,12 @@ void tokenize(char *p) {
       continue;
     }
 
+    if (memcmp(p, "return", 6) == 0){
+      vec_push(tokens, new_token(TK_RETURN, p));
+      p = p + 6;
+      continue;
+    }
+
     if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' ||
         *p == ')' || *p == '=' || *p == ';' || *p == '<' || *p == '>' ||
         *p == '&' || *p == '^' || *p == '|' || *p == '{' || *p == '}' ||

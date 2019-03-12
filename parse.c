@@ -10,6 +10,7 @@ Vector *funcs;
 Map *idents;
 
 Node *statement();
+Node *ret();
 Node *assign();
 Node *bit_or();
 Node *bit_xor();
@@ -127,7 +128,7 @@ Node *term() {
       return new_node_ident(name);
     }
     pos++;
-    Node *arg[2];
+    Node *arg[2] = {NULL, NULL};
     for (int i = 0; i<2; i++) {
       if (consume(')')) {
         break;
@@ -255,6 +256,15 @@ Node *assign() {
   return lhs;
 }
 
+Node *ret() {
+  if (consume(TK_RETURN)) {
+    Node *lhs = assign();
+    Node * node = new_node(ND_RETURN, lhs, NULL);
+    return node;
+  }
+  return assign();
+}
+
 Node *stmt() {
   if (consume(TK_IF)) {
     if (!consume('(')){
@@ -301,7 +311,7 @@ Node *stmt() {
     }
     return new_for_node(init, cond, inc, stmt());
   }
-  Node *node = assign();
+  Node *node = ret();
   if(!consume(';')) {
     error("semicolon not found!: %s", ((Token *)tokens->data[pos])->input);
   }
@@ -341,7 +351,7 @@ Func *func() {
            ((Token *)tokens->data[pos])->ty != TK_EOF) {
       Node *node = stmt();
       vec_push(func->code, node);
-      //      print_tree(node);
+      //print_tree(node);
     }
 
     if (!consume('}')) {

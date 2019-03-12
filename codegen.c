@@ -88,27 +88,33 @@ void gen(Node *node) {
   }
 
   if (node->ty == ND_IF) {
+    static int if_id = 0;
+    static int else_id = 0;
+    static int finish_id = 0;
     gen(node->cond);
     printf("  pop rax\n");
     printf("  cmp rax, 1\n");
     printf("  push rax\n");
-    printf("  je if\n");
+    printf("  je if%d\n", if_id);
     if(node->else_body != NULL) {
-      printf("  jmp else\n");
-      printf("  if:\n");
+      printf("  jmp else%d\n", else_id);
+      printf("  if%d:\n", if_id);
       gen(node->body);
-      printf("  jmp finish\n");
-      printf("  else:\n");
+      printf("  jmp finish%d\n", finish_id);
+      printf("  else%d:\n", else_id);
       gen(node->else_body);
-      printf("  jmp finish\n");
-      printf("  finish:\n");
+      printf("  jmp finish%d\n", finish_id);
+      printf("  finish%d:\n", finish_id);
     }else {
-      printf("  jmp finish\n");
-      printf("  if:\n");
+      printf("  jmp finish%d\n", finish_id);
+      printf("  if%d:\n", if_id);
       gen(node->body);
-      printf("  jmp finish\n");
-      printf("  finish:\n");
+      printf("  jmp finish%d\n", finish_id);
+      printf("  finish%d:\n", finish_id);
     }
+    if_id++;
+    else_id++;
+    finish_id++;
     return;
   }
 
@@ -135,6 +141,16 @@ void gen(Node *node) {
     gen(node->body);
     printf("  jmp begin\n");
     printf("  end:\n");
+    return;
+  }
+
+  if (node->ty == ND_RETURN) {
+    gen(node->lhs);
+    printf("  pop rax\n");
+    // epilogue
+    printf("  mov rsp, rbp\n");
+    printf("  pop rbp\n");
+    printf("  ret\n");
     return;
   }
 
