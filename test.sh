@@ -73,4 +73,5 @@ try 6 "main(){c=bar(); c+1;} bar(){a=2;b=3; a+b;}"
 try 6 "main(){a=bar(); a+1;} bar(){a=2;b=3; a+b;}"
 try 1 "main(){bar(1);} bar(a){a;}"
 try 2 "main(){bar(1);} bar(a){a+1;}"
+try 3 "main(){bar(1, 2);} bar(a, b){a+b;}"
 echo OK

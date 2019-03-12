@@ -26,11 +26,12 @@ void gen_func(Func* func){
     printf("  push rdi\n");
   }
 
-  /* if (func->rhs != NULL) { */
-  /*   printf("  mov rax, rbp\n"); */
-  /*   printf("  sub rax, %d\n", ((int)map_get(idents, func->rhs->name)) * 8); */
-  /*   printf("  push rax\n"); */
-  /* } */
+  if (func->rhs != NULL) {
+    gen_lval(func->rhs);
+    printf("  pop rax\n");
+    printf("  mov [rax], rsi\n");
+    printf("  push rdi\n");
+  }
 
   for(int i=0; i<func->code->len; i++) {
     gen((Node *)func->code->data[i]);
